@@ -563,12 +563,8 @@ static int writeback_sb_inodes(struct super_block *sb, struct bdi_writeback *wb,
 		iput(inode);
 		cond_resched();
 		spin_lock(&wb->list_lock);
-		if (wbc->nr_to_write <= 0) {
-			wbc->more_io = 1;
+		if (wbc->nr_to_write <= 0)
 			return 1;
-		}
-		if (!list_empty(&wb->b_more_io))
-			wbc->more_io = 1;
 	}
 	/* b_io is empty */
 	return 1;
@@ -712,7 +708,6 @@ static long wb_writeback(struct bdi_writeback *wb,
 			wbc.older_than_this = &oldest_jif;
 		}
 
-		wbc.more_io = 0;
 		wbc.nr_to_write = write_chunk;
 		wbc.pages_skipped = 0;
 		wbc.inodes_written = 0;
@@ -744,7 +739,7 @@ static long wb_writeback(struct bdi_writeback *wb,
 		/*
 		 * No more inodes for IO, bail
 		 */
-		if (!wbc.more_io)
+		if (list_empty(&wb->b_more_io))
 			break;
 		/*
 		 * Nothing written. Wait for some inode to
