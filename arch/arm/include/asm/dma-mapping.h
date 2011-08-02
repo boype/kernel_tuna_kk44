@@ -252,6 +252,14 @@ extern void *dma_alloc_stronglyordered(struct device *, size_t, dma_addr_t *,
 #define dma_free_stronglyordered(dev, size, cpu_addr, handle) \
 	dma_free_coherent(dev, size, cpu_addr, handle)
 
+/*
+ * This can be called during boot to increase the size of the consistent
+ * DMA region above it's default value of 2MB. It must be called before the
+ * memory allocator is initialised, i.e. before any core_initcall.
+ */
+extern void __init init_consistent_dma_size(unsigned long size);
+
+
 #ifdef CONFIG_DMABOUNCE
 /*
  * For SA-1111, IXP425, and ADI systems  the dma-mapping functions are "magic"
