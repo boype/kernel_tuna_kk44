@@ -2035,6 +2035,7 @@ extern sector_t blkdev_max_block(struct block_device *bdev);
 extern void bd_forget(struct inode *inode);
 extern void bdput(struct block_device *);
 extern void invalidate_bdev(struct block_device *);
+extern void iterate_bdevs(void (*)(struct block_device *, void *), void *);
 extern int sync_blockdev(struct block_device *bdev);
 extern struct super_block *freeze_bdev(struct block_device *);
 extern void emergency_thaw_all(void);
@@ -2053,6 +2054,10 @@ static inline struct super_block *freeze_bdev(struct block_device *sb)
 static inline int thaw_bdev(struct block_device *bdev, struct super_block *sb)
 {
 	return 0;
+}
+
+static inline void iterate_bdevs(void (*f)(struct block_device *, void *), void *arg)
+{
 }
 #endif
 extern int sync_filesystem(struct super_block *);
