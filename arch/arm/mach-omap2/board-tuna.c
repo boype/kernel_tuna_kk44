@@ -72,8 +72,10 @@
 #include "resetreason.h"
 #include <mach/dmm.h>
 
+#ifdef CONFIG_ANDROID_RAM_CONSOLE
 #define TUNA_RAMCONSOLE_START	(PLAT_PHYS_OFFSET + SZ_512M)
 #define TUNA_RAMCONSOLE_SIZE	SZ_2M
+#endif
 
 struct class *sec_class;
 EXPORT_SYMBOL(sec_class);
@@ -214,6 +216,7 @@ static struct platform_device wl1271_device = {
 	},
 };
 
+#ifdef CONFIG_ANDROID_RAM_CONSOLE
 static struct resource ramconsole_resources[] = {
 	{
 		.flags  = IORESOURCE_MEM,
@@ -233,6 +236,7 @@ static struct platform_device ramconsole_device = {
 		.platform_data = &ramconsole_pdata,
 	},
 };
+#endif
 
 static struct platform_device bcm4330_bluetooth_device = {
 	.name = "bcm4330_bluetooth",
@@ -340,7 +344,9 @@ static struct platform_device tuna_spdif_dit_device = {
 };
 
 static struct platform_device *tuna_devices[] __initdata = {
+#ifdef CONFIG_ANDROID_RAM_CONSOLE
 	&ramconsole_device,
+#endif
 	&wl1271_device,
 	&twl6030_madc_device,
 	&tuna_ion_device,
@@ -1373,7 +1379,9 @@ static void __init tuna_init(void)
 	tuna_audio_init();
 	tuna_i2c_init();
 	tuna_gsd4t_gps_init();
+#ifdef CONFIG_ANDROID_RAM_CONSOLE
 	ramconsole_pdata.bootinfo = omap4_get_resetreason();
+#endif
 	platform_add_devices(tuna_devices, ARRAY_SIZE(tuna_devices));
 	board_serial_init();
 	tuna_bt_init();
@@ -1421,7 +1429,9 @@ static void __init tuna_reserve(void)
 	int ret;
 
 	/* do the static reservations first */
+#ifdef CONFIG_ANDROID_RAM_CONSOLE
 	memblock_remove(TUNA_RAMCONSOLE_START, TUNA_RAMCONSOLE_SIZE);
+#endif
 	memblock_remove(PHYS_ADDR_SMC_MEM, PHYS_ADDR_SMC_SIZE);
 	memblock_remove(PHYS_ADDR_DUCATI_MEM, PHYS_ADDR_DUCATI_SIZE);
 
