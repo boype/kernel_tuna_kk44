@@ -275,39 +275,25 @@ static void omap_cpu_early_suspend(struct early_suspend *h)
 
 	mutex_lock(&omap_cpufreq_lock);
 
-	if (screen_off_max_freq && min_capped) {
+	if (screen_off_max_freq) {
 		max_capped = screen_off_max_freq;
 
 		cur = omap_getspeed(0);
-
-		if (cur > max_capped) {
+		if (cur > max_capped)
 			omap_cpufreq_scale(max_capped, cur);
-		}
 
-		else if (current_target_freq < min_capped) {
-			omap_cpufreq_scale(current_target_freq, cur);
-		}
-
-		min_capped = 0;
+			if (min_capped)
+				min_capped = 0;
 	}
-
-	else if (screen_off_max_freq) {
-		max_capped = screen_off_max_freq;
-
-		cur = omap_getspeed(0);
-
-		if (cur > max_capped) {
-			omap_cpufreq_scale(max_capped, cur);
-		}
-	}
-
-	else if (min_capped) {
-		cur = omap_getspeed(0);
-
-		if (current_target_freq < min_capped) {
-			omap_cpufreq_scale(current_target_freq, cur);
-		}
+	
+	if (min_capped) {
 		min_capped = 0;
+		
+		if (!max_capped) {
+			cur = omap_getspeed(0);
+		}
+		if (cur > current_target_freq)
+			omap_cpufreq_scale(current_target_freq, cur);
 	}
 
 	mutex_unlock(&omap_cpufreq_lock);
@@ -318,42 +304,28 @@ static void omap_cpu_late_resume(struct early_suspend *h)
 	unsigned int cur;
 
 	mutex_lock(&omap_cpufreq_lock);
-		
-	if (max_capped && screen_on_min_freq) {
-		max_capped = 0;
+	
+	if (screen_on_min_freq) {
 		min_capped = screen_on_min_freq;
-
+	
 		cur = omap_getspeed(0);
-
-		if (cur < min_capped) {
+		if (cur < min_capped)
 			omap_cpufreq_scale(min_capped, cur);
-		}
-
-		else if (cur != current_target_freq) {
-			omap_cpufreq_scale(current_target_freq, cur);
-		}
-	}
-
-	else if (max_capped) {
-		max_capped = 0;
-
-		cur = omap_getspeed(0);
-
-		if (cur != current_target_freq) {
-			omap_cpufreq_scale(current_target_freq, cur);
-		}
+			
+			if (max_capped)
+				max_capped = 0;
 	}
 		
-	else if (screen_on_min_freq) {
-		min_capped = screen_on_min_freq;
+	if (max_capped) {
+		max_capped = 0;
 
-		cur = omap_getspeed(0);
-
-		if (cur < min_capped) {
-			omap_cpufreq_scale(min_capped, cur);
+		if (!min_capped) {
+			cur = omap_getspeed(0);
 		}
-	}		
-				
+		if (cur != current_target_freq)
+			omap_cpufreq_scale(current_target_freq, cur);
+	}
+
 	mutex_unlock(&omap_cpufreq_lock);
 }
 
@@ -421,7 +393,7 @@ static int __cpuinit omap_cpu_init(struct cpufreq_policy *policy)
 	}
 
 	/* FIXME: what's the actual transition time? */
-	policy->cpuinfo.transition_latency = 300 * 1000;
+	policy->cpuinfo.transition_latency = 30 * 1000;
 
 	return 0;
 
