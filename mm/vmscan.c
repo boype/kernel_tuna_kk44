@@ -1891,16 +1891,18 @@ static void get_scan_count(struct zone *zone, struct scan_control *sc,
 			nr_force_scan[0] = SWAP_CLUSTER_MAX;
 			nr_force_scan[1] = 0;
 			goto out;
-		} else if (!inactive_file_is_low_global(zone)) {
-			/*
-			 * There is enough inactive page cache, do not
-			 * reclaim anything from the working set right now.
-			 */
-			fraction[0] = 0;
-			fraction[1] = 1;
-			denominator = 1;
-			goto out;
 		}
+	}
+
+	/*
+	 * There is enough inactive page cache, do not reclaim
+	 * anything from the anonymous working set right now.
+	 */
+	if (!inactive_file_is_low(zone, sc)) {
+		fraction[0] = 0;
+		fraction[1] = 1;
+		denominator = 1;
+		goto out;
 	}
 
 	/*
