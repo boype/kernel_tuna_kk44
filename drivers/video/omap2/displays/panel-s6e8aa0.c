@@ -769,7 +769,7 @@ static void s6e8aa0_setup_gamma_regs(struct s6e8aa0_data *s6, u8 gamma_regs[],
 
 		v[V1] = s6e8aa0_gamma_lookup(s6, brightness, bv->v1, c);
 		offset = s6->gamma_reg_offsets.v[1][c][V1];
-                offset = offset - min(max(contrast, -32), 24);
+                offset = offset - min(max(contrast, -24), 16);
 		adj_max = min(V1_ADJ_MAX, V1_ADJ_MAX - offset);
 		adj_min = max(0, 0 - offset);
 		adj = v1_to_v1adj(v[V1], v0) - offset;
