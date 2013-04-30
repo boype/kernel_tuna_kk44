@@ -269,7 +269,10 @@ menu "Partition Types"
 source "fs/partitions/Kconfig"
 
 endmenu
-endif
+endif # BLOCK
+
+config FSYNC_CONTROL
+	bool "fsync control"
 
 source "fs/nls/Kconfig"
 source "fs/dlm/Kconfig"
