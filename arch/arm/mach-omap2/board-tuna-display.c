@@ -788,9 +788,9 @@ static struct s6e8aa0_factory_calibration_info tuna_oled_factory_info_8500k = {
 		 * maximum brightness down from 300 cd/m2 to 280.
 		 */
 		.mult = {
-			1770000000U,
-			1810000000U,
-			2000000000U,
+			1860000000U,
+			1890000000U,
+			2100000000U,
 		},
 		.rshift = 31,
 	},
@@ -840,9 +840,9 @@ static struct s6e8aa0_factory_calibration_info tuna_oled_factory_info_6500k = {
 		 * maximum brightness down from 300 cd/m2 to 280.
 		 */
 		.mult = {
-			1770000000U,
-			1810000000U,
-			2000000000U,
+			1860000000U,
+			1890000000U,
+			2100000000U,
 		},
 		.rshift = 31,
 	},
@@ -892,9 +892,9 @@ static struct s6e8aa0_factory_calibration_info tuna_oled_factory_info_sm2a2 = {
 		 * maximum brightness down from 300 cd/m2 to 280.
 		 */
 		.mult = {
-			1770000000U,
-			1810000000U,
-			2000000000U,
+			1860000000U,
+			1890000000U,
+			2100000000U,
 		},
 		.rshift = 31,
 	},
