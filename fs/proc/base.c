@@ -1060,6 +1060,8 @@ static ssize_t oom_adjust_write(struct file *file, const char __user *buf,
 	 */
 	if (task->signal->oom_adj == OOM_ADJUST_MAX)
 		task->signal->oom_score_adj = OOM_SCORE_ADJ_MAX;
+	else if (task->signal->oom_adj == OOM_DISABLE)
+		task->signal->oom_score_adj = OOM_SCORE_ADJ_MIN;		
 	else
 		task->signal->oom_score_adj = (oom_adjust * OOM_SCORE_ADJ_MAX) /
 								-OOM_DISABLE;
