@@ -214,12 +214,17 @@ unsigned int oom_badness(struct task_struct *p, struct mem_cgroup *mem,
 	points += p->signal->oom_score_adj;
 
 	/*
-	 * Never return 0 for an eligible task that may be killed since it's
-	 * possible that no single user task uses more than 0.1% of memory and
-	 * no single admin tasks uses more than 3.0%.
+	 * Return 0 when the task has been explicitly marked as unkillable.
+	 * Otherwise never return 0 for an eligible task that may be killed since
+	 * it's possible that no single user task uses more than 0.1% of memory 
+	 * and no single admin tasks uses more than 3.0%.
 	 */
-	if (points <= 0)
-		return 1;
+	if (points <= 0) {
+		if (p->signal->oom_score_adj == -1000)
+			return 0;
+		else
+			return 1;
+	}
 	return (points < 1000) ? points : 1000;
 }
 
