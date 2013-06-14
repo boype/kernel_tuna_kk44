@@ -220,7 +220,7 @@ unsigned int oom_badness(struct task_struct *p, struct mem_cgroup *mem,
 	 * and no single admin tasks uses more than 3.0%.
 	 */
 	if (points <= 0) {
-		if (p->signal->oom_score_adj == -1000)
+		if (p->signal->oom_score_adj == OOM_SCORE_ADJ_MIN)
 			return 0;
 		else
 			return 1;
