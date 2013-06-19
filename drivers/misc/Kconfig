@@ -603,4 +603,10 @@ config SOUND_CONTROL
 	help
 	  Enable support for Sound Control
 
+config TEMP_CONTROL
+	bool "Enable support for Temperature Control"
+	default y
+	help
+	  Enable support for Temperature Control
+
 endif # MISC_DEVICES
