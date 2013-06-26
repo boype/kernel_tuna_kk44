@@ -7,7 +7,7 @@
 #include <linux/device.h>
 #include <linux/miscdevice.h>
 
-#define DEF_TEMPLIMIT 64000
+#define DEF_TEMPLIMIT 70000
 #define TEMP_FLOOR 50000
 #define TEMP_CEILING 90000
 
