@@ -73,6 +73,7 @@ static unsigned int screen_on_min_freq;
 static bool omap_cpufreq_ready;
 static bool omap_cpufreq_suspended;
 static int oc_val;
+static unsigned int stock_freq_max;
 
 
 static unsigned int omap_getspeed(unsigned int cpu)
@@ -265,6 +266,7 @@ static int omap_target(struct cpufreq_policy *policy,
 
 	ret = cpufreq_frequency_table_target(policy, freq_table, target_freq,
 			relation, &i);
+
 	if (ret) {
 		dev_dbg(mpu_dev, "%s: cpu%d: no freq match for %d(ret=%d)\n",
 			__func__, policy->cpu, target_freq, ret);
@@ -274,6 +276,12 @@ static int omap_target(struct cpufreq_policy *policy,
 	mutex_lock(&omap_cpufreq_lock);
 
 	current_target_freq = freq_table[i].frequency;
+
+	if (current_target_freq > stock_freq_max) {
+		current_target_freq = policy->max;
+		if (current_target_freq == policy->cur)
+			current_target_freq = stock_freq_max;
+	}
 
 	if (!omap_cpufreq_suspended)
 		ret = omap_cpufreq_scale(current_target_freq, policy->cur);
@@ -388,7 +396,7 @@ static int __cpuinit omap_cpu_init(struct cpufreq_policy *policy)
 	cpufreq_frequency_table_get_attr(freq_table, policy->cpu);
 
 	policy->min = 192000;
-	policy->max = 1228800;
+	policy->max = stock_freq_max = 1228800;
 	policy->cur = omap_getspeed(policy->cpu);
 
 	for (i = 0; freq_table[i].frequency != CPUFREQ_TABLE_END; i++)
