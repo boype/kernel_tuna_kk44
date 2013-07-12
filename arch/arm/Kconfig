@@ -1428,6 +1428,8 @@ choice
 	  If you are not absolutely sure what you are doing, leave this
 	  option alone!
 
+	config VMSPLIT_TUNA_OPT
+		bool "2.5G/1.5G user/kernel split"
 	config VMSPLIT_3G
 		bool "3G/1G user/kernel split"
 	config VMSPLIT_2G
@@ -1440,6 +1442,7 @@ config PAGE_OFFSET
 	hex
 	default 0x40000000 if VMSPLIT_1G
 	default 0x80000000 if VMSPLIT_2G
+	default 0xA0000000 if VMSPLIT_TUNA_OPT
 	default 0xC0000000
 
 config NR_CPUS
