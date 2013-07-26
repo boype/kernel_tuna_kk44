@@ -399,4 +399,12 @@ config FORCE_FAST_CHARGE
 	  A simple sysfs interface to force adapters that
 	  are detected as USB to charge as AC.
 
+config TUNA_1_5_GHZ_MPU_OPP
+	bool "Enable Tuna 1.5 GHz MPU OPP"
+	depends on MACH_TUNA
+	default n
+	help
+	  If enabled, 1.5 GHz can be selected as CPU
+	  overclock frequency.
+
 endif
