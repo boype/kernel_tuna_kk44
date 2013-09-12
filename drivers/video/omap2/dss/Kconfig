@@ -9,6 +9,9 @@ if OMAP2_DSS
 config OMAP2_VRAM_SIZE
 	int "VRAM size (MB)"
 	range 0 32
+	default 12 if TUNA_HUGEMEM
+	default 16 if !TUNA_HUGEMEM && MACH_TUNA
+	
 	default 0
 	help
 	  The amount of SDRAM to reserve at boot time for video RAM use.

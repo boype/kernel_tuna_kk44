@@ -407,4 +407,14 @@ config TUNA_1_5_GHZ_MPU_OPP
 	  If enabled, 1.5 GHz can be selected as CPU
 	  overclock frequency.
 
+config TUNA_HUGEMEM
+	bool "Additional ~74 MB RAM for Tuna"
+	depends on MACH_TUNA
+	default n
+	help
+	  If enabled, approximately 74 MB of additional
+	  RAM will be available, while 1080p camera
+	  functionality is unavailable (and might crash
+	  camera-related applications).
+
 endif
