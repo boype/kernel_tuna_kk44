@@ -176,10 +176,16 @@ static void cpufreq_ondemandplus_timer(unsigned long data)
 	struct cpufreq_ondemandplus_cpuinfo *pcpu =
 		&per_cpu(cpuinfo, data);
 	u64 now_idle;
-	unsigned int new_freq;
+	unsigned int new_freq = 0;
 	unsigned int index;
 	static unsigned int stay_counter;
 	unsigned long flags;
+	static unsigned int i = 0;
+	static unsigned int last_cpu_freqs[5];
+	static unsigned int avg_cpu_freq = 0;
+	static unsigned int lo_avg_cpu_freq;
+	static unsigned int hi_avg_cpu_freq;
+	static unsigned int low_timer_rate = 0;
 
 	smp_rmb();
 
@@ -408,13 +414,68 @@ rearm:
 			pcpu->timer_idlecancel = 1;
 		}
 
+		/*
+		 * Calculate the average CPU frequency of the last 5 timer
+		 * cycles. Then check if the new to-be-requested frequency
+		 * is within a divergent range of 15% for lower frequencies,
+		 * or is equal to the average for higher frequencies. 
+		 * If yes, slow down the timer. 
+		 */
+		if (i >= 4) {
+			unsigned int k;
+			avg_cpu_freq = 0;
+			for (k = 0; k <= 4; k++) {
+				avg_cpu_freq += last_cpu_freqs[k];
+			}
+			avg_cpu_freq /= 5;
+			hi_avg_cpu_freq = (avg_cpu_freq * 115) / 100;
+			lo_avg_cpu_freq = (avg_cpu_freq * 100) / 115;
+
+			if (new_freq < inter_lofreq && hi_avg_cpu_freq > new_freq && 
+						lo_avg_cpu_freq < new_freq) {
+				if (max_capped != screen_off_max_freq)
+					low_timer_rate = timer_rate * 2;
+				else
+					low_timer_rate = timer_rate * 3;
+			} else if (new_freq >= inter_lofreq && avg_cpu_freq == new_freq) {
+				low_timer_rate = timer_rate * 2;
+			} else {
+				low_timer_rate = 0;
+			}
+			i = 0;
+		} else {
+			if (new_freq < inter_lofreq && (hi_avg_cpu_freq < new_freq ||
+						lo_avg_cpu_freq > new_freq))
+				low_timer_rate = 0;
+			else if (new_freq >= inter_lofreq && avg_cpu_freq != new_freq)
+				low_timer_rate = 0;
+		}
+
+		/* 
+		 * Re-arm timer
+		 */				
 		pcpu->time_in_idle = get_cpu_idle_time(
 			data, &pcpu->idle_exit_time);
-		mod_timer(&pcpu->cpu_timer,
-			jiffies + usecs_to_jiffies(timer_rate));
+		if (!low_timer_rate) {
+			mod_timer(&pcpu->cpu_timer,
+				jiffies + usecs_to_jiffies(timer_rate));
+		} else {
+			mod_timer(&pcpu->cpu_timer,
+				jiffies + usecs_to_jiffies(low_timer_rate));
+		}
 	}
 
 exit:
+	/*
+	 * Write CPU frequency of new timer cycle into the correct
+	 * last_cpu_freqs array-field
+	 */
+	if (new_freq) {
+		static unsigned int last_cpu_freq_field;
+		last_cpu_freq_field = i % 5;
+		last_cpu_freqs[last_cpu_freq_field] = new_freq;
+		i++;
+	}
 	return;
 }
 
