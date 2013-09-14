@@ -29,8 +29,8 @@
 #include "control.h"
 #include "mux.h"
 
-#ifdef CONFIG_TUNA_HUGEMEM
-#define TUNA_FB_RAM_SIZE		SZ_1M * 12 /* ~1280*720*4 * 2 */
+#ifdef CONFIG_TUNA_BIGMEM
+#define TUNA_FB_RAM_SIZE		SZ_1M * 11 /* ~1280*720*4 * 2 */
 #else
 #define TUNA_FB_RAM_SIZE		SZ_16M /* ~1280*720*4 * 2 */
 #endif
