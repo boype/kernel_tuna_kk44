@@ -9,8 +9,6 @@ if OMAP2_DSS
 config OMAP2_VRAM_SIZE
 	int "VRAM size (MB)"
 	range 0 32
-	default 11 if TUNA_BIGMEM
-	default 16 if !TUNA_BIGMEM && MACH_TUNA
 	
 	default 0
 	help
