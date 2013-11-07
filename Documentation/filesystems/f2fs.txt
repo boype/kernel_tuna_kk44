@@ -187,8 +187,8 @@ Files in /sys/fs/f2fs/<devname>
  min_ipu_util                 This parameter controls the threshold to trigger
                               in-place-updates. The number indicates percentage
                               of the filesystem utilization, and used by
-                              F2FS_IPU_UTIL and F2FS_IPU_SSR_UTIL policies.
-
+                              F2FS_IPU_UTIL and F2FS_IPU_SSR_UTIL policies.AD
+ 
  max_victim_search	      This parameter controls the number of trials to
 			      find a victim segment when conducting SSR and
 			      cleaning operations. The default value is 4096
