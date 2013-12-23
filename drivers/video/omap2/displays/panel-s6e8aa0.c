@@ -70,7 +70,7 @@ enum {
 #define DRIVER_NAME "s6e8aa0_i2c"
 #define DEVICE_NAME "s6e8aa0_i2c"
 
-static int contrast = -6;
+static int contrast = -5;
 module_param(contrast, int, 0755);
 EXPORT_SYMBOL(contrast);
 
