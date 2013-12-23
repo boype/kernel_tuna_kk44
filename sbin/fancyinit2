@@ -1,0 +1,80 @@
+#!/system/bin/sh
+
+# init.d support
+if [ ! -e /system/etc/init.d ] ; then
+  mount -o remount,rw /system
+  mkdir /system/etc/init.d
+  chown -R root.root /system/etc/init.d
+  chmod -R 755 /system/etc/init.d
+  mount -o remount,ro /system
+fi
+
+# powerHAL fix
+if [ ! -e /system/lib/hw/power.tuna.so.bak ] ; then
+  mount -o remount,rw /system
+  mv /system/lib/hw/power.tuna.so /system/lib/hw/power.tuna.so.bak
+  cp /sbin/power.tuna.so /system/lib/hw/
+  chmod 644 /system/lib/hw/power.tuna.so
+  needreboot=1
+fi
+
+# disable 1080p with BIGMEM-enabled kernels
+version=$(uname -r | awk -F- '{print $NF}')
+if [[ $version == big ]] && [[ ! -e /system/etc/media_profiles.xml.bak ]] ; then
+  mount -o remount,rw /system
+  mv /system/etc/media_profiles.xml /system/etc/media_profiles.xml.bak
+  cp /sbin/media_profiles.xml /system/etc/
+  chown root:root /system/etc/media_profiles.xml
+  chmod 644 /system/etc/media_profiles.xml
+  cp /sbin/bigmemcheck /system/etc/init.d/62bigmemcheck
+  chown root:root /system/etc/init.d/62bigmemcheck
+  chmod 755 /system/etc/init.d/62bigmemcheck
+  needreboot=1
+fi
+
+if [ $needreboot -eq 1 ] ; then 
+  reboot
+fi
+
+# execute init.d scripts
+run-parts /system/etc/init.d
+
+# wait for system being 'up'
+until [ $(pgrep com.android.systemui) ] ; do
+  sleep 1
+done
+
+# ensure max cpu freq is set properly
+echo 1228800 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+
+# change some processes' cgroups and priorities
+sleep 5
+
+echo 91 > /dev/cpuctl/apps/bg_non_interactive/cpu.shares
+echo 400000 > /dev/cpuctl/apps/bg_non_interactive/cpu.rt_runtime_us
+
+renice -18 $(pgrep com.android.systemui)
+renice 5 $(pgrep kswapd)
+
+echo $(pgrep com.android.systemui) > /dev/cpuctl/tasks
+
+# set cgroup_timer_slack for bg_non_interactive tasks
+echo 100000000 > /dev/cpuctl/apps/bg_non_interactive/timer_slack.min_slack_ns
+
+# low memory killer whitelist for common launchers
+sleep 20
+
+list="com.cyanogenmod.trebuchet com.android.launcher org.adw.launcher org.adwfreak.launcher com.anddoes.launcher com.gau.go.launcherex com.mobint.hololauncher com.mobint.hololauncher.hd com.teslacoilsw.launcher org.zeam com.chrislacy.actionlauncher.pro com.android.lmt com.tsf.shell com.miui.mihome2 com.qihoo360.launcher com.gtp.nextlauncher net.alamoapps.launcher"
+
+if [ ! -e /data/nowhitelist ] ; then
+  for class in $list ; do
+    if [ $(pgrep $class) ] ; then
+      pid=$(pgrep $class)
+      until [ -e /proc/$pid ] ; do
+        sleep 1
+      done
+      echo -17 > /proc/$pid/oom_adj
+      break
+    fi
+  done
+fi

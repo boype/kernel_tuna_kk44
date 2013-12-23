@@ -1,0 +1,12 @@
+#!/system/bin/sh
+
+version=$(uname -r | awk -F- '{print $NF}')
+if [[ $version != big ]] && [[ -e /system/etc/media_profiles.xml.bak ]] ; then
+  mount -o remount,rw /system
+  rm -f /system/etc/media_profiles.xml
+  mv /system/etc/media_profiles.xml.bak /system/etc/media_profiles.xml
+  chown root:root /system/etc/media_profiles.xml
+  chmod 644 /system/etc/media_profiles.xml
+  rm -f /system/etc/init.d/62bigmemcheck
+  mount -o remount,ro /system
+fi
