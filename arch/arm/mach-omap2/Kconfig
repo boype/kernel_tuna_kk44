@@ -407,14 +407,12 @@ config TUNA_1_5_GHZ_MPU_OPP
 	  If enabled, 1.5 GHz can be selected as CPU
 	  overclock frequency.
 
-config TUNA_BIGMEM
-	bool "Additional 61 MB userspace RAM for Tuna"
-	depends on MACH_TUNA
+config TUNA_ASRAM
+	bool "Additional Safe RAM of ~50 MB"
 	default n
 	help
-	  If enabled, approximately 66 MB of additional
-	  RAM will be available, while 1080p camera
-	  functionality is faulty (and might crash
-	  camera-related applications).
+	  If enabled, reclaims 50 MB from the reserved RAM. Reclaming 
+	  max 50 MB is safe and makes 1080p camera
+	  functionality working.
 
 endif
