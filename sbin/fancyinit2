@@ -1,41 +1,5 @@
 #!/system/bin/sh
 
-# init.d support
-if [ ! -e /system/etc/init.d ] ; then
-  mount -o remount,rw /system
-  mkdir /system/etc/init.d
-  chown -R root.root /system/etc/init.d
-  chmod -R 755 /system/etc/init.d
-  mount -o remount,ro /system
-fi
-
-# powerHAL fix
-if [ ! -e /system/lib/hw/power.tuna.so.bak ] ; then
-  mount -o remount,rw /system
-  mv /system/lib/hw/power.tuna.so /system/lib/hw/power.tuna.so.bak
-  cp /sbin/power.tuna.so /system/lib/hw/
-  chmod 644 /system/lib/hw/power.tuna.so
-  needreboot=1
-fi
-
-# disable 1080p with BIGMEM-enabled kernels
-version=$(uname -r | awk -F- '{print $NF}')
-if [[ $version == big ]] && [[ ! -e /system/etc/media_profiles.xml.bak ]] ; then
-  mount -o remount,rw /system
-  mv /system/etc/media_profiles.xml /system/etc/media_profiles.xml.bak
-  cp /sbin/media_profiles.xml /system/etc/
-  chown root:root /system/etc/media_profiles.xml
-  chmod 644 /system/etc/media_profiles.xml
-  cp /sbin/bigmemcheck /system/etc/init.d/62bigmemcheck
-  chown root:root /system/etc/init.d/62bigmemcheck
-  chmod 755 /system/etc/init.d/62bigmemcheck
-  needreboot=1
-fi
-
-if [ $needreboot -eq 1 ] ; then 
-  reboot
-fi
-
 # execute init.d scripts
 run-parts /system/etc/init.d
 
