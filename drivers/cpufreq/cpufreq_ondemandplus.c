@@ -323,8 +323,6 @@ static void cpufreq_ondemandplus_timer(unsigned long data)
 					new_freq = pcpu->policy->max;
 				}
 			}
-		}
-
 		/* Check for frequency decrease */
 
 		/*
@@ -332,7 +330,7 @@ static void cpufreq_ondemandplus_timer(unsigned long data)
 		* can support the current CPU usage without triggering the up
 		* policy. To be safe, we focus 10 points under the threshold.
 		*/
-		if (load_freq < (up_threshold - down_differential) *
+		} else if (load_freq < (up_threshold - down_differential) *
 				pcpu->target_freq) {
 			
 			if (pcpu->target_freq != screen_on_min_freq) {
