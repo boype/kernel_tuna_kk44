@@ -105,7 +105,7 @@ static struct clocksource clocksource_32k = {
 	.rating		= 250,
 	.read		= omap_32k_read_dummy,
 	.mask		= CLOCKSOURCE_MASK(32),
-	.flags		= CLOCK_SOURCE_IS_CONTINUOUS,
+	.flags		= CLOCK_SOURCE_IS_CONTINUOUS | CLOCK_SOURCE_SUSPEND_NONSTOP,
 };
 
 /*
