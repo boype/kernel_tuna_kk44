@@ -1,0 +1,9 @@
+# Execute fancyinit1 startup script
+service fancyinit1 /sbin/fancyinit1
+    class main
+    oneshot
+
+# Execute fancyinit2 startup script
+service fancyinit2 /sbin/fancyinit2
+    class late_start
+    oneshot

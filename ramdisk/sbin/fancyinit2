@@ -1,0 +1,55 @@
+#!/system/bin/sh
+
+# initialize LMK values asap
+minfree=3072,4096,6144,7680,9216,14436
+lmk=/sys/module/lowmemorykiller/parameters/minfree
+minboot=`cat $lmk`
+while sleep 1 ; do
+  if [ `cat $lmk` != $minboot ] ; then
+    [ `cat $lmk` != $minfree ] && echo $minfree > $lmk || exit
+  fi
+done&
+
+# wait for systemui to be up
+until [ $(pgrep com.android.systemui) ] ; do
+  sleep 1
+done
+
+# set max cpu freq again because it may have been overwritten by the OS
+echo 1228800 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+
+sleep 5
+
+# decrease max. realtime cpu runtime of background apps
+echo 91 > /dev/cpuctl/apps/bg_non_interactive/cpu.shares
+echo 400000 > /dev/cpuctl/apps/bg_non_interactive/cpu.rt_runtime_us
+
+# change niceness of systemui
+busybox renice -18 -p $(pgrep com.android.systemui)
+if [ $? -ne 0 ] ; then
+    renice -18 $(pgrep com.android.systemui)
+fi
+
+# move systemui to the parent task group
+echo $(pgrep com.android.systemui) > /dev/cpuctl/tasks
+
+# set cgroup_timer_slack for bg_non_interactive tasks
+echo 100000000 > /dev/cpuctl/apps/bg_non_interactive/timer_slack.min_slack_ns
+
+# low memory killer whitelist for common launchers
+sleep 20
+
+list="com.cyanogenmod.trebuchet com.android.launcher org.adw.launcher org.adwfreak.launcher com.anddoes.launcher com.gau.go.launcherex com.mobint.hololauncher com.mobint.hololauncher.hd com.teslacoilsw.launcher org.zeam com.chrislacy.actionlauncher.pro com.android.lmt com.tsf.shell com.miui.mihome2 com.qihoo360.launcher com.gtp.nextlauncher net.alamoapps.launcher"
+
+if [ ! -e /data/nowhitelist ] ; then
+  for class in $list ; do
+    if [ $(pgrep $class) ] ; then
+      pid=$(pgrep $class)
+      until [ -e /proc/$pid ] ; do
+        sleep 1
+      done
+      echo -17 > /proc/$pid/oom_adj
+      break
+    fi
+  done
+fi
