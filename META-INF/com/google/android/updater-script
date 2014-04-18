@@ -7,10 +7,11 @@ ui_print("AnyKernel Script by osm0sis @ xda-developers");
 ui_print(" ");
 ui_print("Installing kernel...");
 assert(run_program("/sbin/sh", "/tmp/anykernel/anykernel.sh"));
+ui_print(" ");
+ui_print(file_getprop("/tmp/anykernel/statusmsg", "status.text"));
 ifelse(file_getprop("/tmp/anykernel/anykernel.sh", "do.cleanup") == 1,
   (delete_recursive("/tmp/anykernel");
   )
 );
 ui_print(" ");
-ui_print("Done!");
 

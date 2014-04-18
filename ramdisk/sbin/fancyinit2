@@ -1,7 +1,7 @@
 #!/system/bin/sh
 
 # initialize LMK values asap
-minfree=3072,4096,6144,7680,9216,14436
+minfree=3072,3584,4608,5632,6144,13312
 lmk=/sys/module/lowmemorykiller/parameters/minfree
 minboot=`cat $lmk`
 while sleep 1 ; do
@@ -25,9 +25,11 @@ echo 91 > /dev/cpuctl/apps/bg_non_interactive/cpu.shares
 echo 400000 > /dev/cpuctl/apps/bg_non_interactive/cpu.rt_runtime_us
 
 # change niceness of systemui
-busybox renice -18 -p $(pgrep com.android.systemui)
+busybox renice -10 -p $(pgrep com.android.systemui)
+busybox renice 5 -p $(pgrep flush-)
 if [ $? -ne 0 ] ; then
-    renice -18 $(pgrep com.android.systemui)
+  renice -10 $(pgrep com.android.systemui)
+  renice 5 $(pgrep flush-)
 fi
 
 # move systemui to the parent task group
@@ -36,20 +38,3 @@ echo $(pgrep com.android.systemui) > /dev/cpuctl/tasks
 # set cgroup_timer_slack for bg_non_interactive tasks
 echo 100000000 > /dev/cpuctl/apps/bg_non_interactive/timer_slack.min_slack_ns
 
-# low memory killer whitelist for common launchers
-sleep 20
-
-list="com.cyanogenmod.trebuchet com.android.launcher org.adw.launcher org.adwfreak.launcher com.anddoes.launcher com.gau.go.launcherex com.mobint.hololauncher com.mobint.hololauncher.hd com.teslacoilsw.launcher org.zeam com.chrislacy.actionlauncher.pro com.android.lmt com.tsf.shell com.miui.mihome2 com.qihoo360.launcher com.gtp.nextlauncher net.alamoapps.launcher"
-
-if [ ! -e /data/nowhitelist ] ; then
-  for class in $list ; do
-    if [ $(pgrep $class) ] ; then
-      pid=$(pgrep $class)
-      until [ -e /proc/$pid ] ; do
-        sleep 1
-      done
-      echo -17 > /proc/$pid/oom_adj
-      break
-    fi
-  done
-fi

@@ -18,16 +18,39 @@ ramdisk=/tmp/anykernel/ramdisk;
 bin=/tmp/anykernel/tools;
 split_img=/tmp/anykernel/split_img;
 patch=/tmp/anykernel/patch;
+status=/tmp/anykernel/statusmsg;
+statuscode=0;
 
 cd $ramdisk;
 chmod -R 755 $bin;
 mkdir -p $split_img;
 
+# write status code
+write_status() {
+  if [ $statuscode -eq 0 ]; then
+    statuscode="$1";
+    if [ $1 -eq 99 ]; then
+      echo "status.text=Kernel installed successfully!" > $status;
+    else
+      echo "status.text=Kernel could not be installed! Error code: $1" > $status;
+    fi;
+  fi;
+}
+
 # dump boot and extract ramdisk
 dump_boot() {
   dd if=$block of=/tmp/anykernel/boot.img;
+  if [ $? -ne 0 ]; then
+    write_status 1;
+  fi;
   $bin/unpackbootimg -i /tmp/anykernel/boot.img -o $split_img;
+  if [ $? -ne 0 ]; then
+    write_status 2;
+  fi;
   gunzip -c $split_img/boot.img-ramdisk.gz | cpio -i;
+  if [ $? -ne 0 ]; then
+    write_status 3;
+  fi;
 }
 
 # repack ramdisk then build and write image
@@ -38,8 +61,19 @@ write_boot() {
   pagesize=`cat *-pagesize`;
   cd $ramdisk;
   find . | cpio -o -H newc | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
+  if [ $? -ne 0 ]; then
+    write_status 4;
+  fi;
   $bin/mkbootimg --kernel /tmp/anykernel/zImage --ramdisk /tmp/anykernel/ramdisk-new.cpio.gz --cmdline "$cmdline" --base $base --pagesize $pagesize --output /tmp/anykernel/boot-new.img;
+  if [ $? -ne 0 ]; then
+    write_status 5;
+  fi;
   dd if=/tmp/anykernel/boot-new.img of=$block;
+  if [ $? -ne 0 ]; then
+    write_status 6;
+  else
+    write_status 99;
+  fi;
 }
 
 # backup_file <file>
