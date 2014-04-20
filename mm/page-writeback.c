@@ -35,7 +35,6 @@
 #include <linux/buffer_head.h>
 #include <linux/pagevec.h>
 #include <trace/events/writeback.h>
-#include <linux/earlysuspend.h>
 
 /*
  * After a CPU has dirtied this many pages, balance_dirty_pages_ratelimited
@@ -90,18 +89,12 @@ unsigned long vm_dirty_bytes;
 /*
  * The interval between `kupdate'-style writebacks
  */
-#define DEFAULT_DIRTY_WRITEBACK_INTERVAL 0 /* centiseconds */
-unsigned int dirty_writeback_interval,
-		resume_dirty_writeback_interval;
-suspend_dirty_writeback_interval = 2000;
+unsigned int dirty_writeback_interval = 5 * 100; /* centiseconds */
 
 /*
  * The longest time for which data is allowed to remain dirty
  */
-#define DEFAULT_DIRTY_EXPIRE_INTERVAL 200 /* centiseconds */
-unsigned int dirty_expire_interval,
-		resume_dirty_expire_interval;
-suspend_dirty_expire_interval = 1000;
+unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
 
 /*
  * Flag that makes the machine dump writes/reads and block dirtyings.
@@ -779,28 +772,6 @@ static struct notifier_block __cpuinitdata ratelimit_nb = {
 	.next		= NULL,
 };
 
-static void dirty_early_suspend(struct early_suspend *handler)
-{
-	if (dirty_writeback_interval != resume_dirty_writeback_interval)
-		resume_dirty_writeback_interval = dirty_writeback_interval;
-	if (dirty_expire_interval != resume_dirty_expire_interval)
-		resume_dirty_expire_interval = dirty_expire_interval;
-
-	dirty_writeback_interval = suspend_dirty_writeback_interval;
-	dirty_expire_interval = suspend_dirty_expire_interval;
-}
-
-static void dirty_late_resume(struct early_suspend *handler)
-{
-	dirty_writeback_interval = resume_dirty_writeback_interval;
-	dirty_expire_interval = resume_dirty_expire_interval;
-}
-
-static struct early_suspend dirty_suspend = {
-	.suspend = dirty_early_suspend,
-	.resume = dirty_late_resume,
-};
-
 /*
  * Called early on to tune the page writeback dirty limits.
  *
@@ -822,13 +793,6 @@ static struct early_suspend dirty_suspend = {
 void __init page_writeback_init(void)
 {
 	int shift;
-
-	dirty_writeback_interval = resume_dirty_writeback_interval =
-			DEFAULT_DIRTY_WRITEBACK_INTERVAL;
-	dirty_expire_interval = resume_dirty_expire_interval =
-			DEFAULT_DIRTY_EXPIRE_INTERVAL;
-
-	register_early_suspend(&dirty_suspend);
 
 	writeback_set_ratelimit();
 	register_cpu_notifier(&ratelimit_nb);
