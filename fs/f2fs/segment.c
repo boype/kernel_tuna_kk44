@@ -1056,7 +1056,7 @@ static inline bool is_merged_page(struct f2fs_sb_info *sbi,
 	if (!io->bio)
 		goto out;
 
-	bio_for_each_segment_all(bvec, io->bio, i) ; {
+	bio_for_each_segment_all(bvec, io->bio, i) {
 		if (page == bvec->bv_page) {
 			up_read(&io->io_rwsem);
 			return true;
