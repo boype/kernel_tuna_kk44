@@ -230,8 +230,8 @@ static void sysfs_refresh_inode(struct sysfs_dirent *sd, struct inode *inode)
 					    iattrs->ia_secdata_len);
 	}
 
-	if (sysfs_type(sd) == SYSFS_DIR)
-		inode->i_nlink = sysfs_count_nlink(sd);
+	//if (sysfs_type(sd) == SYSFS_DIR)
+	//	inode->i_nlink = sysfs_count_nlink(sd);
 }
 
 int sysfs_getattr(struct vfsmount *mnt, struct dentry *dentry, struct kstat *stat)
