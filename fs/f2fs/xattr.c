@@ -195,9 +195,7 @@ int f2fs_init_security(struct inode *inode, struct inode *dir,
                         return 0;
                 return err;
         }
-        err = __f2fs_setxattr(inode, F2FS_XATTR_INDEX_SECURITY,
-                            name, value,
-                            len, (struct page *)ipage);
+   
         kfree(name);
         kfree(value);
         return err;
