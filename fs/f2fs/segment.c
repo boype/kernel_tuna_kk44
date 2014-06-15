@@ -196,7 +196,6 @@ void f2fs_balance_fs_bg(struct f2fs_sb_info *sbi)
 		f2fs_sync_fs(sbi->sb, true);
 }
 
-<<<<<<< HEAD
 struct __submit_bio_ret {
 	struct completion event;
 	int error;
@@ -225,9 +224,6 @@ static int __submit_bio_wait(int rw, struct bio *bio)
 }
 
 int issue_flush_thread(void *data)
-=======
-static int issue_flush_thread(void *data)
->>>>>>> 2163d19... f2fs: introduce help function {create,destroy}_flush_cmd_control
 {
 	struct f2fs_sb_info *sbi = data;
 	struct flush_cmd_control *fcc = SM_I(sbi)->cmd_control_info;
