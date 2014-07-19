@@ -4,7 +4,7 @@
 # specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
 
 
-/dev/block/platform/omap/omap_hsmmc.0/by-name/system    /system             f2fs      rw,flush_merge,discard,noatime,nodiratime,background_gc=on,inline_xattr,active_logs=4    wait
+/dev/block/platform/omap/omap_hsmmc.0/by-name/system    /system             f2fs      ro,flush_merge,discard,noatime,nodiratime,background_gc=on,inline_xattr,active_logs=4    wait
 /dev/block/platform/omap/omap_hsmmc.0/by-name/efs       /factory            ext4      ro                                                    wait
 /dev/block/platform/omap/omap_hsmmc.0/by-name/cache     /cache              f2fs      rw,flush_merge,noatime,nodiratime,background_gc=on,inline_xattr,active_logs=4    wait
 /dev/block/platform/omap/omap_hsmmc.0/by-name/userdata  /data               f2fs      rw,flush_merge,noatime,nodiratime,background_gc=on,inline_xattr,active_logs=4    wait,nonremovable,encryptable=/dev/block/platform/omap/omap_hsmmc.0/by-name/metadata

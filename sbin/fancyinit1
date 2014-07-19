@@ -1,25 +1,27 @@
 #!/system/bin/sh
 
+bb=/sbin/bb/busybox
+
 # cpu, sched and cache tweaks
-echo 384000 > /sys/devices/system/cpu/cpu0/cpufreq/screen_on_min_freq
-echo 537600 > /sys/devices/system/cpu/cpu0/cpufreq/screen_off_max_freq
-echo 1228800 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/gpu_oc
-echo 2 > /sys/devices/system/cpu/sched_mc_power_savings
-echo 15000000 > /proc/sys/kernel/sched_latency_ns
-echo 2000000 > /proc/sys/kernel/sched_min_granularity_ns
-echo 3000000 > /proc/sys/kernel/sched_wakeup_granularity_ns
-echo 0 > /proc/sys/vm/swappiness
-echo 55 > /proc/sys/vm/vfs_cache_pressure
-echo 0 > /proc/sys/vm/dirty_writeback_centisecs
-echo 10240 > /proc/sys/vm/min_free_kbytes
-echo 8388608 > /proc/sys/vm/dirty_bytes
-echo 2097152 > /proc/sys/vm/dirty_background_bytes
+$bb echo 384000 > /sys/devices/system/cpu/cpu0/cpufreq/screen_on_min_freq
+$bb echo 537600 > /sys/devices/system/cpu/cpu0/cpufreq/screen_off_max_freq
+$bb echo 1228800 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+$bb echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/gpu_oc
+$bb echo 2 > /sys/devices/system/cpu/sched_mc_power_savings
+$bb echo 15000000 > /proc/sys/kernel/sched_latency_ns
+$bb echo 2000000 > /proc/sys/kernel/sched_min_granularity_ns
+$bb echo 3000000 > /proc/sys/kernel/sched_wakeup_granularity_ns
+$bb echo 0 > /proc/sys/vm/swappiness
+$bb echo 55 > /proc/sys/vm/vfs_cache_pressure
+$bb echo 0 > /proc/sys/vm/dirty_writeback_centisecs
+$bb echo 10240 > /proc/sys/vm/min_free_kbytes
+$bb echo 8388608 > /proc/sys/vm/dirty_bytes
+$bb echo 2097152 > /proc/sys/vm/dirty_background_bytes
 
 # block tweaks
 for i in /sys/block/*/queue ; do
-  echo 0 > $i/iostats
-  echo 0 > $i/rotational
+  $bb echo 0 > $i/iostats
+  $bb echo 0 > $i/rotational
 done
 
-echo 2 > /sys/block/mmcblk0/queue/rq_affinity
+$bb echo 2 > /sys/block/mmcblk0/queue/rq_affinity
