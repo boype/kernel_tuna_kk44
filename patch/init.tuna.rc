@@ -1,3 +1,8 @@
+# ext4/f2fs script
+service fsprops /fscheck setprops
+    class core
+    oneshot
+
 # Execute fancyinit1 startup script
 service fancyinit1 /sbin/fancyinit1
     class main

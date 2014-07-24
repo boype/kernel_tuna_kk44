@@ -1,0 +1,32 @@
+#!/sbin/bb/busybox ash
+# osm0sis @ xda-developers
+
+bb=/sbin/bb/busybox;
+cache=/dev/block/platform/*/*/by-name/cache;
+data=/dev/block/platform/*/*/by-name/userdata;
+system=/dev/block/platform/*/*/by-name/system;
+device=tuna;
+
+# check partition filesystem
+# getfs() { $bb blkid $1 | $bb cut -d \" -f4; }
+# comment out and force !ext4=f2fs until we get an updated static busybox that displays fstype
+getfs() {
+  fs=`$bb blkid $1 | $bb cut -d \" -f4`;
+  [ "$fs" != "ext4" ] && echo "f2fs" || echo $fs;
+}
+
+case $1 in
+  mvfstab)
+    # use the data partition filesystem to move in the correct fstab
+    fstype=`getfs $data`;
+    $bb mv -f /fstab-$fstype.$device /fstab.$device;
+    $bb rm -f /fstab-*;
+  ;;
+  setprops)
+    # set filesystem type properties for external use - system mount (toolbox) required
+    setprop ro.fs.cache `getfs $cache`;
+    setprop ro.fs.data `getfs $data`;
+    setprop ro.fs.system `getfs $system`;
+  ;;
+esac;
+

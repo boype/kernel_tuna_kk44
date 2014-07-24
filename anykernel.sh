@@ -127,11 +127,6 @@ replace_file() {
 ## end methods
 
 
-## AnyKernel permissions
-# set permissions for included files
-chmod -R 755 $ramdisk
-
-
 ## AnyKernel install
 dump_boot;
 
@@ -139,15 +134,15 @@ dump_boot;
 
 # init.rc
 replace_string init.rc "cpuctl cpu,timer_slack" "mount cgroup none /dev/cpuctl cpu" "mount cgroup none /dev/cpuctl cpu,timer_slack";
+replace_string init.rc "sched_rt_runtime_us 962500" "write /proc/sys/kernel/sched_rt_runtime_us 950000" "write /proc/sys/kernel/sched_rt_runtime_us 962500";
+replace_string init.rc "cpu.rt_runtime_us 962500" "write /dev/cpuctl/cpu.rt_runtime_us 950000" "write /dev/cpuctl/cpu.rt_runtime_us 962500";
 
 # init.tuna.rc
+replace_line init.tuna.rc "mount_all /fstab.tuna" "\tchmod 750 /fscheck\n\texec /fscheck mvfstab\n\tmount_all /fstab.tuna";
 append_file init.tuna.rc "fancyinit" init.tuna.rc;
 
 # fstab.tuna
-replace_line fstab.tuna "/by-name/system" "/dev/block/platform/omap/omap_hsmmc.0/by-name/system    /system             ext4      ro,noatime,barrier=0                                  wait";
-replace_line fstab.tuna "/by-name/cache" "/dev/block/platform/omap/omap_hsmmc.0/by-name/cache     /cache              ext4      noatime,nosuid,nodev,noauto_da_alloc,nomblk_io_submit,errors=panic    wait,check";
-replace_line fstab.tuna "/by-name/userdata" "/dev/block/platform/omap/omap_hsmmc.0/by-name/userdata  /data               ext4      noatime,nosuid,nodev,noauto_da_alloc,nomblk_io_submit,errors=panic    wait,check,encryptable=/dev/block/platform/omap/omap_hsmmc.0/by-name/metadata";
-append_file fstab.tuna "usbdisk" fstab;
+replace_file fstab.tuna 640 fstab.tuna
 
 # end ramdisk changes
 

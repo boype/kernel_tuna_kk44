@@ -1,40 +1,29 @@
 #!/system/bin/sh
 
-# initialize LMK values asap
-minfree=3072,3584,4608,5632,6144,13312
-lmk=/sys/module/lowmemorykiller/parameters/minfree
-minboot=`cat $lmk`
-while sleep 1 ; do
-  if [ `cat $lmk` != $minboot ] ; then
-    [ `cat $lmk` != $minfree ] && echo $minfree > $lmk || exit
-  fi
-done&
+bb=/sbin/bb/busybox
 
 # wait for systemui to be up
-until [ $(pgrep com.android.systemui) ] ; do
-  sleep 1
+until [ $($bb pgrep com.android.systemui) ] ; do
+  $bb sleep 1
 done
 
 # set max cpu freq again because it may have been overwritten by the OS
-echo 1228800 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+$bb echo 1228800 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
 
-sleep 5
+$bb sleep 5
 
 # decrease max. realtime cpu runtime of background apps
-echo 91 > /dev/cpuctl/apps/bg_non_interactive/cpu.shares
-echo 400000 > /dev/cpuctl/apps/bg_non_interactive/cpu.rt_runtime_us
+$bb echo 91 > /dev/cpuctl/apps/bg_non_interactive/cpu.shares
+$bb echo 400000 > /dev/cpuctl/apps/bg_non_interactive/cpu.rt_runtime_us
 
 # change niceness of systemui
-busybox renice -10 -p $(pgrep com.android.systemui)
-busybox renice 5 -p $(pgrep flush-)
-if [ $? -ne 0 ] ; then
-  renice -10 $(pgrep com.android.systemui)
-  renice 5 $(pgrep flush-)
-fi
+$bb renice -10 $($bb pgrep com.android.systemui)
 
 # move systemui to the parent task group
-echo $(pgrep com.android.systemui) > /dev/cpuctl/tasks
+$bb echo $($bb pgrep com.android.systemui) > /dev/cpuctl/tasks
+
+# move uksm daemon to bg_non_interactive task group
+$bb echo $($bb pgrep uksmd) > /dev/cpuctl/apps/bg_non_interactive/tasks
 
 # set cgroup_timer_slack for bg_non_interactive tasks
-echo 100000000 > /dev/cpuctl/apps/bg_non_interactive/timer_slack.min_slack_ns
-
+$bb echo 100000000 > /dev/cpuctl/apps/bg_non_interactive/timer_slack.min_slack_ns
