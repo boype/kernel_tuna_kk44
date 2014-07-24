@@ -24,4 +24,18 @@ for i in /sys/block/*/queue ; do
   $bb echo 0 > $i/rotational
 done
 
+$bb echo 0 > /sys/block/mmcblk0/queue/add_random
 $bb echo 2 > /sys/block/mmcblk0/queue/rq_affinity
+
+# adjust f2fs ram threshold
+if [ -e /sys/fs/f2fs ] ; then
+  $bb echo 5 > /sys/fs/f2fs/mmcblk0p10/ram_thresh
+  $bb echo 5 > /sys/fs/f2fs/mmcblk0p11/ram_thresh
+  $bb echo 25 > /sys/fs/f2fs/mmcblk0p12/ram_thresh
+fi
+
+# enable and setup UKSM
+$bb echo 1 > /sys/kernel/mm/uksm/run
+$bb echo quiet > /sys/kernel/mm/uksm/cpu_governor
+$bb echo 10 > /sys/kernel/mm/uksm/max_cpu_percentage
+$bb echo 500 > /sys/kernel/mm/uksm/sleep_millisecs
