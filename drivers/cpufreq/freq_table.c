@@ -58,6 +58,7 @@ int cpufreq_frequency_table_verify(struct cpufreq_policy *policy,
 	unsigned int next_larger = ~0;
 	unsigned int i;
 	unsigned int count = 0;
+	unsigned int member = 0;
 
 	pr_debug("request for verification of policy (%u - %u kHz) for cpu %u\n",
 					policy->min, policy->max, policy->cpu);
@@ -76,10 +77,28 @@ int cpufreq_frequency_table_verify(struct cpufreq_policy *policy,
 			count++;
 		else if ((next_larger > freq) && (freq > policy->max))
 			next_larger = freq;
+		/* if policy->max is a member of the available
+		   frequencies, set the member-flag */
+		if (policy->max == freq)
+			member = 1;
 	}
 
-	if (!count)
+	if (!count) {
 		policy->max = next_larger;
+	/* if policy->max is no member of the available frequencies,
+	   adjust it to the closest avail. freq */
+	} else if (member == 0) {
+		for (i = 0; (table[i].frequency != CPUFREQ_TABLE_END); i++) {
+			unsigned int freq1 = table[i].frequency;
+			unsigned int freq2 = table[i + 1].frequency;
+			if (policy->max > freq1 && policy->max < freq2) {
+				unsigned int diff1 = policy->max - freq1;
+				unsigned int diff2 = freq2 - policy->max;
+				if (diff1 >= diff2)
+					policy->max = freq2;
+			}
+		}
+	}
 
 	cpufreq_verify_within_limits(policy, policy->cpuinfo.min_freq,
 				     policy->cpuinfo.max_freq);
