@@ -6,15 +6,20 @@ cache=/dev/block/platform/*/*/by-name/cache;
 data=/dev/block/platform/*/*/by-name/userdata;
 system=/dev/block/platform/*/*/by-name/system;
 device=tuna;
+fsbase=ext4;
 
 # check partition filesystem
 getfs() { $bb blkid $1 | $bb cut -d\" -f4; }
 
 case $1 in
-  mvfstab)
-    # use the data partition filesystem to move in the correct fstab
-    fstype=`getfs $data`;
-    $bb mv -f /fstab-$fstype.$device /fstab.$device;
+  mkfstab)
+    # copy in base then swap out entries for filesystems as detected
+    $bb cp -f /fstab-$fsbase.$device /fstab.$device;
+    for i in $system $cache $data; do
+      fstype=`getfs $i`;
+      fsentry=`$bb grep $i /fstab-$fstype.$device`;
+      $bb sed -i "s|^$i.*|$fsentry|" /fstab.$device;
+    done;
     $bb rm -f /fstab-*;
   ;;
   setprops)
