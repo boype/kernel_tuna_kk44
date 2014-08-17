@@ -299,7 +299,6 @@ static int tuna_wifi_get_mac_addr(unsigned char *buf)
 		return -EFAULT;
 
 	if ((tuna_mac_addr[4] == 0) && (tuna_mac_addr[5] == 0)) {
-		srandom32((uint)jiffies);
 		omap_get_die_id(&oid);
 		rand_mac = (uint)oid.id_3; // id_3 or id_1 ?
 		tuna_mac_addr[3] = (unsigned char)rand_mac;
