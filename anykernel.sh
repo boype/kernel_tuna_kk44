@@ -126,13 +126,11 @@ replace_file() {
 
 ## end methods
 
-
 ## AnyKernel permissions
 # set permissions for included files
-chmod -R 755 $ramdisk
-chmod 644 $ramdisk/fstab.tuna
-chmod 644 $ramdisk/fstab-ext4.tuna
-chmod 644 $ramdisk/fstab-f2fs.tuna
+chmod -R 755 $ramdisk;
+chmod 644 $ramdisk/fstab-ext4.tuna;
+chmod 644 $ramdisk/fstab-f2fs.tuna;
 
 
 ## AnyKernel install
@@ -149,8 +147,13 @@ replace_string init.rc "cpu.rt_runtime_us 962500" "write /dev/cpuctl/cpu.rt_runt
 replace_line init.tuna.rc "mount_all /fstab.tuna" "\tchmod 750 /fscheck\n\texec /fscheck mkfstab\n\tmount_all /fstab.tuna";
 append_file init.tuna.rc "fancyinit" init.tuna.rc;
 
-
 # end ramdisk changes
+
+# add SELinux commandline only in KitKat
+android_ver=$(mount /system; grep "^ro.build.version.release" /system/build.prop | cut -d= -f2; umount /system);
+case $android_ver in
+  4.4*) cmdtmp=`cat $split_img/*-cmdline`; echo "androidboot.selinux=permissive $cmdtmp" > $split_img/*-cmdline;;
+esac;
 
 write_boot;
 

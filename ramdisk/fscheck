@@ -13,12 +13,17 @@ getfs() { $bb blkid $1 | $bb cut -d\" -f4; }
 
 case $1 in
   mkfstab)
-    # copy in base then swap out entries for filesystems as detected
-    $bb cp -f /fstab-$fsbase.$device /fstab.$device;
+    # copy in base if using included Minimal fstab - not required with AnyKernel2
+    if [ "$($bb grep Minimal /fstab.$device)" ]; then
+      $bb cp -f /fstab-$fsbase.$device /fstab.$device;
+    fi;
+    # swap out entries for filesystems as detected
     for i in $system $cache $data; do
       fstype=`getfs $i`;
       fsentry=`$bb grep $i /fstab-$fstype.$device`;
-      $bb sed -i "s|^$i.*|$fsentry|" /fstab.$device;
+      if [ "$fsentry" ]; then
+        $bb sed -i "s|^$i.*|$fsentry|" /fstab.$device;
+      fi;
     done;
     $bb rm -f /fstab-*;
   ;;
