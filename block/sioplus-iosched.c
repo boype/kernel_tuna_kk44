@@ -200,7 +200,7 @@ sio_dispatch_requests(struct request_queue *q, int force)
 	 * Retrieve any expired request after a batch of
 	 * sequential requests.
 	 */
-	if (sd->batched > sd->fifo_batch) {
+	if (sd->batched >= sd->fifo_batch) {
 		sd->batched = 0;
 		rq = sio_choose_expired_request(sd);
 	}
@@ -347,7 +347,7 @@ STORE_FUNCTION(sio_sync_read_expire_store, &sd->fifo_expire[SYNC][READ], 0, INT_
 STORE_FUNCTION(sio_sync_write_expire_store, &sd->fifo_expire[SYNC][WRITE], 0, INT_MAX, 1);
 STORE_FUNCTION(sio_async_read_expire_store, &sd->fifo_expire[ASYNC][READ], 0, INT_MAX, 1);
 STORE_FUNCTION(sio_async_write_expire_store, &sd->fifo_expire[ASYNC][WRITE], 0, INT_MAX, 1);
-STORE_FUNCTION(sio_fifo_batch_store, &sd->fifo_batch, 0, INT_MAX, 0);
+STORE_FUNCTION(sio_fifo_batch_store, &sd->fifo_batch, 1, INT_MAX, 0);
 STORE_FUNCTION(sio_writes_starved_store, &sd->writes_starved, 0, INT_MAX, 0);
 #undef STORE_FUNCTION
 
