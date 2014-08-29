@@ -3,7 +3,7 @@
  * Based on Noop, Deadline and V(R) IO schedulers.
  *
  * Copyright (C) 2012 Miguel Boton <mboton@gmail.com>
- *           (C) 2013 Boy Petersen <boypetersen@gmail.com>
+ *           (C) 2013, 2014 Boy Petersen <boypetersen@gmail.com>
  *
  *
  * This algorithm does not do any kind of sorting, as it is aimed for
@@ -13,8 +13,7 @@
  * Asynchronous and synchronous requests are not treated separately, but
  * we relay on deadlines to ensure fairness.
  *
- * The plus version fixes writes_starved not being initialized on startup
- * and also modifies the write starvation counting logic.
+ * The plus version incorporates several fixes and logic improvements.
  *
  */
 #include <linux/blkdev.h>
