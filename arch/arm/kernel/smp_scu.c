@@ -52,6 +52,9 @@ void __init scu_enable(void __iomem *scu_base)
 		return;
 
 	scu_ctrl |= 1;
+	/* Enable SCU speculative line fill */
+	scu_ctrl |= 8;
+
 	__raw_writel(scu_ctrl, scu_base + SCU_CTRL);
 
 	/*
