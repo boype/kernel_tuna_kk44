@@ -14,7 +14,7 @@ $bb echo 2500000 > /proc/sys/kernel/sched_wakeup_granularity_ns
 $bb echo 0 > /proc/sys/vm/swappiness
 $bb echo 55 > /proc/sys/vm/vfs_cache_pressure
 $bb echo 0 > /proc/sys/vm/dirty_writeback_centisecs
-$bb echo 10240 > /proc/sys/vm/min_free_kbytes
+$bb echo 24576 > /proc/sys/vm/min_free_kbytes
 $bb echo 8388608 > /proc/sys/vm/dirty_bytes
 $bb echo 2097152 > /proc/sys/vm/dirty_background_bytes
 
