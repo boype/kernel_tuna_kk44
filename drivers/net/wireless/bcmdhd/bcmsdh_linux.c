@@ -649,6 +649,14 @@ void bcmsdh_unregister_oob_intr(void)
 		sdhcinfo->oob_irq_registered = FALSE;
 	}
 }
+
+bool bcmsdh_is_oob_intr_registered(void)
+{
+	if (sdhcinfo)
+		return sdhcinfo->oob_irq_registered;
+	else
+		return FALSE;
+	}
 #endif /* defined(OOB_INTR_ONLY) */
 
 #if defined(BCMLXSDMMC)

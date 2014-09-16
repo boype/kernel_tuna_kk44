@@ -197,6 +197,7 @@ extern void bcmsdh_device_remove(void * sdh);
 extern int bcmsdh_register_oob_intr(void * dhdp);
 extern void bcmsdh_unregister_oob_intr(void);
 extern void bcmsdh_oob_intr_set(bool enable);
+extern bool bcmsdh_is_oob_intr_registered(void);
 #endif /* defined(OOB_INTR_ONLY) */
 /* Function to pass device-status bits to DHD. */
 extern uint32 bcmsdh_get_dstatus(void *sdh);
