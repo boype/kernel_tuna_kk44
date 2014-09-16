@@ -38,4 +38,4 @@ $bb echo $($bb pgrep com.android.systemui) > /dev/cpuctl/tasks
 $bb echo $($bb pgrep uksmd) > /dev/cpuctl/apps/bg_non_interactive/tasks
 
 # set cgroup_timer_slack for bg_non_interactive tasks
-$bb echo 100000000 > /dev/cpuctl/apps/bg_non_interactive/timer_slack.min_slack_ns
+$bb echo 50000000 > /dev/cpuctl/apps/bg_non_interactive/timer_slack.min_slack_ns
