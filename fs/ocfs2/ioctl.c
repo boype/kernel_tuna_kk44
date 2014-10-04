@@ -905,12 +905,12 @@ long ocfs2_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		if (get_user(flags, (int __user *) arg))
 			return -EFAULT;
 
-		status = mnt_want_write_file(filp);
+		status = mnt_want_write(filp->f_path.mnt);
 		if (status)
 			return status;
 		status = ocfs2_set_inode_attr(inode, flags,
 			OCFS2_FL_MODIFIABLE);
-		mnt_drop_write_file(filp);
+		mnt_drop_write(filp->f_path.mnt);
 		return status;
 	case OCFS2_IOC_RESVSP:
 	case OCFS2_IOC_RESVSP64:

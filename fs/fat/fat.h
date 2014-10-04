@@ -310,8 +310,7 @@ extern int fat_setattr(struct dentry * dentry, struct iattr * attr);
 extern void fat_truncate_blocks(struct inode *inode, loff_t offset);
 extern int fat_getattr(struct vfsmount *mnt, struct dentry *dentry,
 		       struct kstat *stat);
-extern int fat_file_fsync(struct file *file, loff_t start, loff_t end,
-			  int datasync);
+extern int fat_file_fsync(struct file *file, int datasync);
 
 /* fat/inode.c */
 extern void fat_attach(struct inode *inode, loff_t i_pos);

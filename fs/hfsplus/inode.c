@@ -306,18 +306,12 @@ static int hfsplus_setattr(struct dentry *dentry, struct iattr *attr)
 	return 0;
 }
 
-int hfsplus_file_fsync(struct file *file, loff_t start, loff_t end,
-		       int datasync)
+int hfsplus_file_fsync(struct file *file, int datasync)
 {
 	struct inode *inode = file->f_mapping->host;
 	struct hfsplus_inode_info *hip = HFSPLUS_I(inode);
 	struct hfsplus_sb_info *sbi = HFSPLUS_SB(inode->i_sb);
 	int error = 0, error2;
-
-	error = filemap_write_and_wait_range(inode->i_mapping, start, end);
-	if (error)
-		return error;
-	mutex_lock(&inode->i_mutex);
 
 	/*
 	 * Sync inode metadata into the catalog and extent trees.
@@ -345,8 +339,6 @@ int hfsplus_file_fsync(struct file *file, loff_t start, loff_t end,
 
 	if (!test_bit(HFSPLUS_SB_NOBARRIER, &sbi->flags))
 		blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL, NULL);
-
-	mutex_unlock(&inode->i_mutex);
 
 	return error;
 }
