@@ -140,8 +140,6 @@ dump_boot;
 
 # init.rc
 replace_string init.rc "cpuctl cpu,timer_slack" "mount cgroup none /dev/cpuctl cpu" "mount cgroup none /dev/cpuctl cpu,timer_slack";
-replace_string init.rc "sched_rt_runtime_us 962500" "write /proc/sys/kernel/sched_rt_runtime_us 950000" "write /proc/sys/kernel/sched_rt_runtime_us 962500";
-replace_string init.rc "cpu.rt_runtime_us 962500" "write /dev/cpuctl/cpu.rt_runtime_us 950000" "write /dev/cpuctl/cpu.rt_runtime_us 962500";
 
 # init.tuna.rc
 replace_line init.tuna.rc "mount_all /fstab.tuna" "\tchmod 750 /fscheck\n\texec /fscheck mkfstab\n\tmount_all /fstab.tuna";
