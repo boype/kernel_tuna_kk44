@@ -4,10 +4,10 @@
 # specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
 
 
-/dev/block/platform/omap/omap_hsmmc.0/by-name/system    /system             f2fs      ro,flush_merge,noatime,nodiratime,background_gc=off,discard,inline_data,inline_xattr,active_logs=2    wait
+/dev/block/platform/omap/omap_hsmmc.0/by-name/system    /system             f2fs      ro,noatime,nodiratime,background_gc=off,discard,inline_data,inline_xattr,active_logs=2    wait
 /dev/block/platform/omap/omap_hsmmc.0/by-name/efs       /factory            ext4      ro                                                    wait
-/dev/block/platform/omap/omap_hsmmc.0/by-name/cache     /cache              f2fs      flush_merge,noatime,nosuid,nodev,background_gc=on,inline_data,inline_xattr,active_logs=4    wait
-/dev/block/platform/omap/omap_hsmmc.0/by-name/userdata  /data               f2fs      flush_merge,noatime,nosuid,nodev,background_gc=on,inline_data,inline_xattr,active_logs=4    wait,nonremovable,encryptable=/dev/block/platform/omap/omap_hsmmc.0/by-name/metadata
+/dev/block/platform/omap/omap_hsmmc.0/by-name/cache     /cache              f2fs      noatime,nosuid,nodev,background_gc=on,inline_data,inline_xattr,active_logs=4    wait
+/dev/block/platform/omap/omap_hsmmc.0/by-name/userdata  /data               f2fs      noatime,nosuid,nodev,background_gc=on,inline_data,inline_xattr,active_logs=4    wait,nonremovable,encryptable=/dev/block/platform/omap/omap_hsmmc.0/by-name/metadata
 /dev/block/platform/omap/omap_hsmmc.0/by-name/misc      /misc               emmc      defaults                                              defaults
 /dev/block/platform/omap/omap_hsmmc.0/by-name/boot      /boot               emmc      defaults                                              defaults
 /dev/block/platform/omap/omap_hsmmc.0/by-name/recovery  /recovery           emmc      defaults                                              defaults
