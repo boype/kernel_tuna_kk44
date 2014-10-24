@@ -1,4 +1,4 @@
-#!/system/bin/sh
+#!/sbin/bb/busybox ash
 
 bb=/sbin/bb/busybox
 
@@ -31,11 +31,19 @@ $bb echo 400000 > /dev/cpuctl/apps/bg_non_interactive/cpu.rt_runtime_us
 # change niceness of systemui
 $bb renice -10 $($bb pgrep com.android.systemui)
 
-# move systemui to the parent task group
-$bb echo $($bb pgrep com.android.systemui) > /dev/cpuctl/tasks
-
 # move uksm daemon to bg_non_interactive task group
 $bb echo $($bb pgrep uksmd) > /dev/cpuctl/apps/bg_non_interactive/tasks
 
 # set cgroup_timer_slack for bg_non_interactive tasks
 $bb echo 50000000 > /dev/cpuctl/apps/bg_non_interactive/timer_slack.min_slack_ns
+
+# move systemui to the parent task group
+i=1
+until [ $($bb cat /dev/cpuctl/tasks | $bb grep $($bb pgrep com.android.systemui)) ] ; do
+  $bb echo $($bb pgrep com.android.systemui) > /dev/cpuctl/tasks
+  $bb sleep 5
+  i=$((i+1))
+  if [ i -eq 10 ] ; then
+    break
+  fi
+done
